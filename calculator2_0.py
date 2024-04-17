@@ -1,6 +1,5 @@
 from math import log
 
-
 class Operacoes:
     def __init__(self) -> None:
         pass
@@ -51,6 +50,29 @@ class Operacoes:
         Há arredondamento para 3 casas decimais.'''
         return round(number1 ** (1 / number2), 3)
 
+    def logf(self, number1: float, number2: float) -> float:
+        '''Retorna logarítmo entre dois números.'''
+        if self.trocar_base():
+            number1 = self.insert_value()
+
+        number1 = self.valid_base(number1)
+        number2 = self.valid_logaritmando(number2)
+        return round(log(number2, number1), 3)
+
+    def fatr(self, number1: float) -> float:
+        '''Calcula o fatorial de um número.'''
+        while number1 < 0 or number1 % 1 != 0:
+            print('\nValor do fatorial deve ser natural (Inteiro maior ou igual a 0)')
+            number1 = self.insert_value()
+
+        result = 1
+        if number1 != 0:
+            while number1 > 0:
+                result *= number1
+                number1 -= 1
+
+        return result
+
     @staticmethod
     def trocar_base() -> bool:
         '''Verifica se o usuário deseja trocar a base da equação logarítma.'''
@@ -73,16 +95,7 @@ class Operacoes:
             number2 = self.insert_value()
         return number2
 
-    def logf(self, number1: float, number2: float) -> float:
-        '''Retorna logarítmo entre dois números.'''
-        if self.trocar_base():
-            number1 = self.insert_value()
-
-        number1 = self.valid_base(number1)
-        number2 = self.valid_logaritmando(number2)
-        return round(log(number2, number1), 3)
-
-
+    
 class Menus(Operacoes):
     def __init__(self) -> None:
         super().__init__()
@@ -92,7 +105,8 @@ class Menus(Operacoes):
         '''Retorna o número da operação escolhida pelo usuário.'''
         return int(input(
             "\nInforme a operação:\n1- Soma\n2- Subtração\n3- Multiplicação"
-            "\n4- Divisão\n5- Exponenciação\n6- Radiciação\n7- Logarítmo\n\n"
+            "\n4- Divisão\n5- Exponenciação\n6- Radiciação\n7- Logarítmo"
+            "\n8- Fatorial\n\n"
         ))
 
     @staticmethod
@@ -135,7 +149,8 @@ class Menus(Operacoes):
             4: self.divd,
             5: self.expo,
             6: self.raiz,
-            7: self.logf
+            7: self.logf,
+            8: self.fatr
         }
         resp = self.input_operacao()
         return operations.get(resp)
@@ -161,20 +176,34 @@ class Menus(Operacoes):
         else:
             print(f'\nResultado: {number}\n')
 
-    def operation(self, number1: float | None) -> float | None:
+    def operation(self, number1: float | None = None) -> float | None:
         '''Executa a operação selecionada pelo usuário.
         Caso o primeiro valor seja None, haverá a requisição de um valor ao usuário.'''
         operation_func = self.valid_operation()
-
-        if number1 is None:
-            number1 = self.insert_value()
-        print(f'Primeiro número: {number1}')
-
-        number2 = self.insert_value()
-        print(f'Segundo número: {number2}')
-
+        
         try:
-            result = operation_func(number1, number2)
+            if operation_func == self.fatr:
+                if number1 is None:
+                   number1 = self.insert_value()
+                else:
+                    r = int(input("Deseja mudar o número?\n1- Sim\n2- Não\n\n"))
+                    if r == 1:
+                        number1 = self.insert_value()
+
+                print(f'Primeiro número: {number1}')
+
+                result = operation_func(number1)
+
+
+            else:
+                if number1 is None:
+                    number1 = self.insert_value()
+                print(f'Primeiro número: {number1}')
+
+                number2 = self.insert_value()
+                print(f'Segundo número: {number2}')
+                result = operation_func(number1, number2)
+
             self.show_result(result)
             return result
         except ValueError as e:
@@ -199,6 +228,3 @@ class Menus(Operacoes):
         result = self.operation(result)
         if result is not None:
             self.continuar(result)
-
-
-Menus().main()
